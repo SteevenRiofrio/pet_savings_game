@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐾 Mi Mascota Ahorradora</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-size: 2.5em;
+            color: #4a90e2;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .money-display {
+            font-size: 1.5em;
+            color: #27ae60;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pet-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .pet-selection {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .pet-option {
+            font-size: 2.5em;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 15px;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .pet-option:hover {
+            background: rgba(52, 152, 219, 0.1);
+            border-color: #3498db;
+            transform: scale(1.1);
+        }
+
+        .pet-option.selected {
+            background: rgba(52, 152, 219, 0.2);
+            border-color: #3498db;
+        }
+
+        /* Estilos para los modales */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-danger {
+            border: 4px solid #e74c3c;
+        }
+
+        .modal-success {
+            border: 4px solid #27ae60;
+        }
+
+        .modal-title {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .modal-title.danger {
+            color: #e74c3c;
+        }
+
+        .modal-title.success {
+            color: #27ae60;
+        }
+
+        .modal-avatar {
+            font-size: 5em;
+            margin: 20px 0;
+        }
+
+        .modal-message {
+            font-size: 1.3em;
+            line-height: 1.5;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+
+        .modal-stats {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .modal-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            transform: scale(1.05);
+        }
+
+        .modal-btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .modal-btn-danger:hover {
+            background: linear-gradient(45deg, #c0392b, #e74c3c);
+            transform: scale(1.05);
+        }
+
+        .modal-btn-success {
+            background: linear-gradient(45deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .modal-btn-success:hover {
+            background: linear-gradient(45deg, #229954, #27ae60);
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .pet-avatar {
+            font-size: 6em;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .pet-name {
+            font-size: 1.8em;
+            color: #e74c3c;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .pet-name:hover {
+            background: rgba(231, 76, 60, 0.1);
+            transform: scale(1.05);
+        }
+
+        .stats {
+            margin: 20px 0;
+        }
+
+        .stat-bar {
+            margin: 10px 0;
+            text-align: left;
+        }
+
+        .stat-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .bar-container {
+            background: #ecf0f1;
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .hunger-bar { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        .fun-bar { background: linear-gradient(90deg, #f39c12, #e67e22); }
+        .health-bar { background: linear-gradient(90deg, #27ae60, #229954); }
+        .love-bar { background: linear-gradient(90deg, #e91e63, #ad1457); }
+
+        .shop-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .shop-title {
+            font-size: 1.8em;
+            color: #8e44ad;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .shop-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #bdc3c7;
+            color: #2c3e50;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .tab:hover {
+            background: #2980b9;
+            color: white;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .item-price {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .buy-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .buy-btn:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: scale(1.05);
+        }
+
+        .buy-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .trap-item {
+            border: 2px solid #e74c3c;
+            background: linear-gradient(135deg, #ffebee, #fff);
+        }
+
+        .trap-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            animation: pulse 2s infinite;
+        }
+
+        .trap-btn:hover {
+            background: linear-gradient(45deg, #c0392b, #e74c3c);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .activities {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .activities-title {
+            font-size: 1.8em;
+            color: #e67e22;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .activity-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .activity-btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .activity-btn:hover {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            transform: scale(1.05);
+        }
+
+        .savings-goal {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .goal-title {
+            font-size: 1.5em;
+            color: #9b59b6;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .goal-progress {
+            background: #ecf0f1;
+            border-radius: 25px;
+            height: 30px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .goal-fill {
+            background: linear-gradient(90deg, #9b59b6, #8e44ad);
+            height: 100%;
+            border-radius: 25px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.success { background: #27ae60; }
+        .message.error { background: #e74c3c; }
+        .message.info { background: #3498db; }
+
+        @media (max-width: 768px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .pet-avatar {
+                font-size: 4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🐾 Mi Mascota Ahorradora</h1>
+            <div class="money-display">💰 Monedas: <span id="money">100</span></div>
+        </div>
+
+        <div class="game-area">
+            <div class="pet-section">
+                <div class="pet-avatar" id="petAvatar">🐶</div>
+                <div class="pet-name" id="petName" onclick="changePetName()">Buddy</div>
+                <div style="font-size: 0.9em; color: #7f8c8d; margin-bottom: 15px;">
+                    👆 Haz clic en el nombre para cambiarlo
+                </div>
+                
+                <div style="font-size: 0.9em; color: #7f8c8d; margin-bottom: 10px;">
+                    🐾 Elige tu mascota:
+                </div>
+                <div class="pet-selection">
+                    <div class="pet-option selected" onclick="changePetType('🐶', 'perro')" data-pet="🐶">🐶</div>
+                    <div class="pet-option" onclick="changePetType('🐱', 'gato')" data-pet="🐱">🐱</div>
+                    <div class="pet-option" onclick="changePetType('🐰', 'conejo')" data-pet="🐰">🐰</div>
+                    <div class="pet-option" onclick="changePetType('🐹', 'hámster')" data-pet="🐹">🐹</div>
+                    <div class="pet-option" onclick="changePetType('🐸', 'rana')" data-pet="🐸">🐸</div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-bar">
+                        <div class="stat-label">🍖 Hambre</div>
+                        <div class="bar-container">
+                            <div class="bar-fill hunger-bar" id="hungerBar">75%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-bar">
+                        <div class="stat-label">🎾 Diversión</div>
+                        <div class="bar-container">
+                            <div class="bar-fill fun-bar" id="funBar">60%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-bar">
+                        <div class="stat-label">❤️ Salud</div>
+                        <div class="bar-container">
+                            <div class="bar-fill health-bar" id="healthBar">80%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-bar">
+                        <div class="stat-label">💖 Amor</div>
+                        <div class="bar-container">
+                            <div class="bar-fill love-bar" id="loveBar">70%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-section">
+                <h2 class="shop-title">🏪 Tienda de Mascotas</h2>
+                
+                <div class="shop-tabs">
+                    <div class="tab active" onclick="showTab('food')">🍖 Comida</div>
+                    <div class="tab" onclick="showTab('toys')">🎾 Juguetes</div>
+                    <div class="tab" onclick="showTab('premium')">⭐ Premium</div>
+                </div>
+
+                <div id="food-items" class="items-grid">
+                    <div class="item-card">
+                        <div class="item-icon">🥩</div>
+                        <div class="item-name">Comida Básica</div>
+                        <div class="item-price">💰 10 monedas</div>
+                        <button class="buy-btn" onclick="buyItem('food-basic', 10, 20)">Comprar</button>
+                    </div>
+                    
+                    <div class="item-card">
+                        <div class="item-icon">🍖</div>
+                        <div class="item-name">Comida Premium</div>
+                        <div class="item-price">💰 25 monedas</div>
+                        <button class="buy-btn" onclick="buyItem('food-premium', 25, 40)">Comprar</button>
+                    </div>
+                    
+                    <div class="item-card trap-item">
+                        <div class="item-icon">🍭</div>
+                        <div class="item-name">Dulces (¡No saludables!)</div>
+                        <div class="item-price">💰 5 monedas</div>
+                        <button class="buy-btn trap-btn" onclick="buyTrapItem('candy', 5, -15, 'health')">¡Comprar!</button>
+                    </div>
+                    
+                    <div class="item-card trap-item">
+                        <div class="item-icon">🍔</div>
+                        <div class="item-name">Comida Chatarra</div>
+                        <div class="item-price">💰 8 monedas</div>
+                        <button class="buy-btn trap-btn" onclick="buyTrapItem('junk-food', 8, -10, 'health')">¡Comprar!</button>
+                    </div>
+                    
+                    <div class="item-card">
+                        <div class="item-icon">🍽️</div>
+                        <div class="item-name">Dispensador Automático</div>
+                        <div class="item-price">💰 120 monedas</div>
+                        <button class="buy-btn" onclick="buyPermanentItem('auto-feeder', 120)">Comprar</button>
+                    </div>
+                </div>
+
+                <div id="toys-items" class="items-grid" style="display: none;">
+                    <div class="item-card">
+                        <div class="item-icon">🎾</div>
+                        <div class="item-name">Pelota Simple</div>
+                        <div class="item-price">💰 15 monedas</div>
+                        <button class="buy-btn" onclick="buyItem('toy-basic', 15, 25)">Comprar</button>
+                    </div>
+                    
+                    <div class="item-card">
+                        <div class="item-icon">🧸</div>
+                        <div class="item-name">Juguete de Peluche</div>
+                        <div class="item-price">💰 30 monedas</div>
+                        <button class="buy-btn" onclick="buyItem('toy-premium', 30, 45)">Comprar</button>
+                    </div>
+                    
+                    <div class="item-card trap-item">
+                        <div class="item-icon">📱</div>
+                        <div class="item-name">Tablet (¡Muy caro!)</div>
+                        <div class="item-price">💰 150 monedas</div>
+                        <button class="buy-btn trap-btn" onclick="buyExpensiveTrap('tablet', 150, 10, 'fun')">¡Comprar!</button>
+                    </div>
+                    
+                    <div class="item-card trap-item">
+                        <div class="item-icon">🎮</div>
+                        <div class="item-name">Videojuego Caro</div>
+                        <div class="item-price">💰 200 monedas</div>
+                        <button class="buy-btn trap-btn" onclick="buyExpensiveTrap('expensive-game', 200, 15, 'fun')">¡Comprar!</button>
+                    </div>
+                    
+                    <div class="item-card">
+                        <div class="item-icon">🎪</div>
+                        <div class="item-name">Parque de Diversiones</div>
+                        <div class="item-price">💰 300 monedas</div>
+                        <button class="buy-btn" onclick="buyPermanentItem('fun-park', 300)">Comprar</button>
+                    </div>
+                </div>
+
+                <div id="premium-items" class="items-grid" style="display: none;">
+                    <div class="item-card">
+                        <div class="item-icon">🏠</div>
+                        <div class="item-name">Casa de Lujo</div>
+                        <div class="item-price">💰 200 monedas</div>
+                        <button class="buy-btn" onclick="buyPermanentItem('luxury-house', 200)">Comprar</button>
+                    </div>
+                    
+                    <div class="item-card">
+                        <div class="item-icon">💎</div>
+                        <div class="item-name">Collar de Diamantes</div>
+                        <div class="item-price">💰 500 monedas</div>
+                        <button class="buy-btn" onclick="buyPermanentItem('diamond-collar', 500)">Comprar</button>
+                    </div>
+                    
+                    <div class="item-card trap-item">
+                        <div class="item-icon">💸</div>
+                        <div class="item-name">Compra Impulsiva</div>
+                        <div class="item-price">💰 100 monedas</div>
+                        <button class="buy-btn trap-btn" onclick="buyImpulseTrap('impulse-buy', 100)">¡Oferta!</button>
+                    </div>
+                    
+                    <div class="item-card trap-item">
+                        <div class="item-icon">🎰</div>
+                        <div class="item-name">Lotería (¡Riesgo!)</div>
+                        <div class="item-price">💰 50 monedas</div>
+                        <button class="buy-btn trap-btn" onclick="buyGambleTrap('lottery', 50)">¡Intentar Suerte!</button>
+                    </div>
+                    
+                    <div class="item-card">
+                        <div class="item-icon">🚗</div>
+                        <div class="item-name">Auto para Mascotas</div>
+                        <div class="item-price">💰 800 monedas</div>
+                        <button class="buy-btn" onclick="buyPermanentItem('pet-car', 800)">Comprar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activities">
+            <h2 class="activities-title">🎮 Actividades para Ganar Monedas</h2>
+            <div class="activity-buttons">
+                <button class="activity-btn" onclick="earnMoney('walk', 15)">🚶 Pasear (15 monedas)</button>
+                <button class="activity-btn" onclick="earnMoney('play', 20)">🎾 Jugar (20 monedas)</button>
+                <button class="activity-btn" onclick="earnMoney('train', 25)">🎯 Entrenar (25 monedas)</button>
+                <button class="activity-btn" onclick="earnMoney('show', 50)">🏆 Competencia (50 monedas)</button>
+            </div>
+        </div>
+
+        <div class="savings-goal">
+            <h2 class="goal-title">🎯 Meta de Ahorro: Casa de Lujo</h2>
+            <div class="goal-progress">
+                <div class="goal-fill" id="goalProgress">50%</div>
+            </div>
+            <p style="text-align: center; margin-top: 10px;">
+                <span id="goalCurrent">100</span> / <span id="goalTarget">200</span> monedas
+            </p>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <!-- Modal de Peligro -->
+    <div id="dangerModal" class="modal">
+        <div class="modal-content modal-danger">
+            <div class="modal-title danger">⚠️ ¡ALERTA!</div>
+            <div class="modal-avatar" id="dangerModalAvatar">🐶</div>
+            <div class="modal-message" id="dangerModalMessage">
+                ¡Tu mascota está en peligro!
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-danger" onclick="closeModal('dangerModal')">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Victoria -->
+    <div id="victoryModal" class="modal">
+        <div class="modal-content modal-success">
+            <div class="modal-title success">🎉 ¡FELICITACIONES!</div>
+            <div class="modal-avatar" id="victoryModalAvatar">🐶</div>
+            <div class="modal-message" id="victoryModalMessage">
+                ¡Has completado tu meta de ahorro!
+            </div>
+            <div class="modal-stats" id="victoryModalStats">
+                <!-- Stats dinámicos aquí -->
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-success" onclick="closeModal('victoryModal')">¡Genial!</button>
+                <button class="modal-btn modal-btn-primary" onclick="setNewGoal()">Nueva Meta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Game Over -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content modal-danger">
+            <div class="modal-title danger">💔 GAME OVER</div>
+            <div class="modal-avatar">😢</div>
+            <div class="modal-message" id="gameOverMessage">
+                Tu mascota se ha ido porque no la cuidaste bien...
+            </div>
+            <div class="modal-stats" id="gameOverStats">
+                <!-- Stats finales aquí -->
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-primary" onclick="restartGame()">Jugar de Nuevo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Bienvenida/Personalización -->
+    <div id="welcomeModal" class="modal show">
+        <div class="modal-content">
+            <div class="modal-title success">🎉 ¡Bienvenido!</div>
+            <div style="font-size: 1.3em; margin: 20px 0; color: #2c3e50;">
+                ¡Vamos a crear tu mascota virtual y aprender a ahorrar juntos!
+            </div>
+            
+            <div style="margin: 30px 0;">
+                <h3 style="color: #8e44ad; margin-bottom: 15px;">🐾 Elige tu mascota:</h3>
+                <div class="pet-selection" style="justify-content: center;">
+                    <div class="pet-option selected" onclick="selectWelcomePet('🐶', 'perro', this)" data-pet="🐶">🐶</div>
+                    <div class="pet-option" onclick="selectWelcomePet('🐱', 'gato', this)" data-pet="🐱">🐱</div>
+                    <div class="pet-option" onclick="selectWelcomePet('🐰', 'conejo', this)" data-pet="🐰">🐰</div>
+                    <div class="pet-option" onclick="selectWelcomePet('🐹', 'hámster', this)" data-pet="🐹">🐹</div>
+                    <div class="pet-option" onclick="selectWelcomePet('🐸', 'rana', this)" data-pet="🐸">🐸</div>
+                </div>
+            </div>
+
+            <div style="margin: 30px 0;">
+                <h3 style="color: #e74c3c; margin-bottom: 15px;">📝 Dale un nombre:</h3>
+                <input type="text" id="welcomePetName" placeholder="Escribe el nombre aquí..." 
+                       style="width: 100%; padding: 15px; font-size: 1.2em; border: 3px solid #3498db; 
+                              border-radius: 15px; text-align: center; font-family: inherit;"
+                       maxlength="15" value="Buddy">
+            </div>
+
+            <div style="margin: 30px 0; padding: 20px; background: #ecf0f1; border-radius: 15px;">
+                <h4 style="color: #2c3e50; margin-bottom: 10px;">🎯 Tu misión:</h4>
+                <p style="margin: 0; color: #7f8c8d; line-height: 1.5;">
+                    Cuida a tu mascota y aprende a ahorrar dinero para comprar cosas especiales. 
+                    ¡Toma buenas decisiones financieras!
+                </p>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-success" onclick="startGame()" style="font-size: 1.3em; padding: 20px 40px;">
+                    🚀 ¡Empezar Aventura!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables temporales para el modal de bienvenida
+        let welcomeSelection = {
+            avatar: '🐶',
+            type: 'perro',
+            name: 'Buddy'
+        };
+
+        // Variables del juego
+        let gameState = {
+            money: 100,
+            pet: {
+                name: 'Buddy',
+                avatar: '🐶',
+                type: 'perro',
+                hunger: 75,
+                fun: 60,
+                health: 80,
+                love: 70
+            },
+            ownedItems: [],
+            savingsGoal: {
+                target: 200,
+                item: 'Casa de Lujo'
+            },
+            gameActive: false, // Inicia inactivo hasta completar personalización
+            dangerWarnings: {
+                hunger: false,
+                fun: false,
+                health: false,
+                love: false
+            }
+        };
+
+        // Función para seleccionar mascota en el modal de bienvenida
+        function selectWelcomePet(avatar, type, element) {
+            // Remover selección anterior
+            document.querySelectorAll('#welcomeModal .pet-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Seleccionar nueva mascota
+            element.classList.add('selected');
+            
+            welcomeSelection.avatar = avatar;
+            welcomeSelection.type = type;
+            
+            // Sugerir nombre apropiado
+            const namesSuggestions = {
+                'perro': ['Buddy', 'Max', 'Luna', 'Rocky', 'Bella'],
+                'gato': ['Miau', 'Pelusa', 'Garfield', 'Nala', 'Felix'],
+                'conejo': ['Bunny', 'Conejito', 'Saltarín', 'Nieve', 'Zanahoria'],
+                'hámster': ['Hammy', 'Bolita', 'Chispita', 'Nuez', 'Peludo'],
+                'rana': ['Kero', 'Verdecita', 'Saltitos', 'Renata', 'Croac']
+            };
+            
+            const suggestions = namesSuggestions[type];
+            const randomName = suggestions[Math.floor(Math.random() * suggestions.length)];
+            
+            document.getElementById('welcomePetName').value = randomName;
+            welcomeSelection.name = randomName;
+        }
+
+        // Función para iniciar el juego después de la personalización
+        function startGame() {
+            const nameInput = document.getElementById('welcomePetName');
+            const customName = nameInput.value.trim();
+            
+            if (customName === '') {
+                nameInput.style.borderColor = '#e74c3c';
+                nameInput.placeholder = '¡Tu mascota necesita un nombre!';
+                return;
+            }
+            
+            if (customName.length > 15) {
+                nameInput.style.borderColor = '#e74c3c';
+                showMessage('El nombre es muy largo. Máximo 15 caracteres.', 'error');
+                return;
+            }
+            
+            // Aplicar personalización al juego
+            gameState.pet.name = customName;
+            gameState.pet.avatar = welcomeSelection.avatar;
+            gameState.pet.type = welcomeSelection.type;
+            gameState.gameActive = true;
+            
+            // Cerrar modal de bienvenida
+            closeModal('welcomeModal');
+            
+            // Mostrar mensaje de bienvenida personalizado
+            showMessage(`¡Hola ${customName}! ¡Comienza tu aventura de ahorro!`, 'success');
+            
+            // Actualizar UI
+            updateUI();
+            
+            // Actualizar selector de mascota en el juego principal
+            document.querySelectorAll('.pet-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.pet === welcomeSelection.avatar) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+        function changePetName() {
+            const currentName = gameState.pet.name;
+            const newName = prompt(`¿Cómo quieres llamar a tu ${gameState.pet.type}?`, currentName);
+            
+            if (newName && newName.trim() !== '') {
+                const cleanName = newName.trim();
+                if (cleanName.length <= 15) {
+                    gameState.pet.name = cleanName;
+                    showMessage(`¡Ahora tu ${gameState.pet.type} se llama ${cleanName}!`, 'success');
+                    updateUI();
+                } else {
+                    showMessage('El nombre es muy largo. Máximo 15 caracteres.', 'error');
+                }
+            }
+        }
+
+        // Función para cambiar el tipo de mascota
+        function changePetType(avatar, type) {
+            // Remover selección anterior
+            document.querySelectorAll('.pet-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Seleccionar nueva mascota
+            event.target.classList.add('selected');
+            
+            gameState.pet.avatar = avatar;
+            gameState.pet.type = type;
+            
+            // Sugerir nombres según la mascota
+            const namesSuggestions = {
+                'perro': ['Buddy', 'Max', 'Luna', 'Rocky', 'Bella'],
+                'gato': ['Miau', 'Pelusa', 'Garfield', 'Nala', 'Felix'],
+                'conejo': ['Bunny', 'Conejito', 'Saltarín', 'Nieve', 'Zanahoria'],
+                'hámster': ['Hammy', 'Bolita', 'Chispita', 'Nuez', 'Peludo'],
+                'rana': ['Kero', 'Verdecita', 'Saltitos', 'Renata', 'Croac']
+            };
+            
+            const suggestions = namesSuggestions[type];
+            const randomName = suggestions[Math.floor(Math.random() * suggestions.length)];
+            
+            if (gameState.pet.name === 'Buddy' || confirm(`¿Quieres cambiar el nombre a ${randomName}?`)) {
+                gameState.pet.name = randomName;
+            }
+            
+            showMessage(`¡Ahora tienes un ${type} llamado ${gameState.pet.name}!`, 'success');
+            updateUI();
+        }
+        function showMessage(text, type = 'info') {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.classList.add('show');
+            
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 3000);
+        }
+
+        // Función para actualizar la UI
+        function updateUI() {
+            if (!gameState.gameActive) return;
+            
+            document.getElementById('money').textContent = gameState.money;
+            document.getElementById('petName').textContent = gameState.pet.name;
+            document.getElementById('petAvatar').textContent = gameState.pet.avatar;
+            
+            // Actualizar barras de estado
+            const stats = ['hunger', 'fun', 'health', 'love'];
+            stats.forEach(stat => {
+                const value = gameState.pet[stat];
+                const bar = document.getElementById(`${stat}Bar`);
+                bar.style.width = `${value}%`;
+                bar.textContent = `${value}%`;
+            });
+
+            // Actualizar meta de ahorro
+            const progress = Math.min((gameState.money / gameState.savingsGoal.target) * 100, 100);
+            document.getElementById('goalProgress').style.width = `${progress}%`;
+            document.getElementById('goalProgress').textContent = `${Math.round(progress)}%`;
+            document.getElementById('goalCurrent').textContent = gameState.money;
+            document.getElementById('goalTarget').textContent = gameState.savingsGoal.target;
+
+            // Actualizar botones de compra
+            updateBuyButtons();
+            
+            // Verificar condiciones críticas
+            checkCriticalConditions();
+            
+            // Verificar victoria
+            checkVictoryCondition();
+        }
+
+        // Función para actualizar botones de compra
+        function updateBuyButtons() {
+            const buttons = document.querySelectorAll('.buy-btn');
+            buttons.forEach(button => {
+                const price = parseInt(button.textContent.match(/\d+/)?.[0] || 0);
+                button.disabled = gameState.money < price;
+            });
+        }
+
+        // Función para cambiar tabs de la tienda
+        function showTab(tabName) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('[id$="-items"]').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(`${tabName}-items`).style.display = 'grid';
+            
+            // Actualizar tabs activos
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Función para comprar items temporales
+        function buyItem(itemType, price, benefit) {
+            if (gameState.money >= price) {
+                gameState.money -= price;
+                
+                // Aplicar beneficio según el tipo de item
+                if (itemType.includes('food')) {
+                    gameState.pet.hunger = Math.min(100, gameState.pet.hunger + benefit);
+                    showMessage(`¡${gameState.pet.name} está más satisfecho! +${benefit} Hambre`, 'success');
+                } else if (itemType.includes('toy')) {
+                    gameState.pet.fun = Math.min(100, gameState.pet.fun + benefit);
+                    showMessage(`¡${gameState.pet.name} se divierte más! +${benefit} Diversión`, 'success');
+                }
+                
+                updateUI();
+            } else {
+                showMessage('¡No tienes suficientes monedas! Prueba hacer más actividades.', 'error');
+            }
+        }
+
+        // Función para verificar condiciones críticas
+        function checkCriticalConditions() {
+            const criticalLevel = 0;
+            const warningLevel = 15;
+            
+            // Verificar si alguna barra llegó a 0
+            if (gameState.pet.hunger <= criticalLevel) {
+                showGameOver('hunger', '¡Tu mascota murió de hambre! 😢', 'No la alimentaste lo suficiente.');
+                return;
+            }
+            
+            if (gameState.pet.health <= criticalLevel) {
+                showGameOver('health', '¡Tu mascota murió por falta de salud! 😢', 'No cuidaste su salud adecuadamente.');
+                return;
+            }
+            
+            if (gameState.pet.love <= criticalLevel) {
+                showGameOver('love', '¡Tu mascota se fue porque no se sentía amada! 💔', 'No le diste suficiente amor y atención.');
+                return;
+            }
+            
+            if (gameState.pet.fun <= criticalLevel) {
+                showDangerWarning('fun', '¡Tu mascota está muy deprimida! 😢', 'Necesita más diversión o podría enfermarse gravemente.');
+                return;
+            }
+            
+            // Verificar advertencias (solo una vez por stat)
+            if (gameState.pet.hunger <= warningLevel && !gameState.dangerWarnings.hunger) {
+                showDangerWarning('hunger', '⚠️ ¡Tu mascota tiene mucha hambre!', 'Dale comida pronto o podría morir.');
+            }
+            
+            if (gameState.pet.health <= warningLevel && !gameState.dangerWarnings.health) {
+                showDangerWarning('health', '⚠️ ¡La salud de tu mascota está crítica!', 'Necesita atención médica urgente.');
+            }
+            
+            if (gameState.pet.love <= warningLevel && !gameState.dangerWarnings.love) {
+                showDangerWarning('love', '⚠️ ¡Tu mascota se siente abandonada!', 'Dale más amor o podría irse para siempre.');
+            }
+            
+            if (gameState.pet.fun <= warningLevel && !gameState.dangerWarnings.fun) {
+                showDangerWarning('fun', '⚠️ ¡Tu mascota está muy triste!', 'Necesita jugar y divertirse más.');
+            }
+        }
+
+        // Función para mostrar advertencia de peligro
+        function showDangerWarning(stat, title, message) {
+            gameState.dangerWarnings[stat] = true;
+            
+            document.getElementById('dangerModalAvatar').textContent = gameState.pet.avatar;
+            document.getElementById('dangerModalMessage').innerHTML = `
+                <strong>${title}</strong><br><br>
+                ${message}<br><br>
+                <strong>${gameState.pet.name}</strong> necesita tu ayuda inmediatamente.
+            `;
+            
+            showModal('dangerModal');
+        }
+
+        // Función para mostrar Game Over
+        function showGameOver(reason, title, message) {
+            gameState.gameActive = false;
+            
+            document.getElementById('gameOverMessage').innerHTML = `
+                <strong>${title}</strong><br><br>
+                ${message}<br><br>
+                <strong>${gameState.pet.name}</strong> ya no está contigo...
+            `;
+            
+            // Mostrar estadísticas finales
+            const statsHtml = `
+                <div class="modal-stat">
+                    <span>🍖 Hambre Final:</span>
+                    <span style="color: ${gameState.pet.hunger <= 15 ? '#e74c3c' : '#27ae60'}">${gameState.pet.hunger}%</span>
+                </div>
+                <div class="modal-stat">
+                    <span>🎾 Diversión Final:</span>
+                    <span style="color: ${gameState.pet.fun <= 15 ? '#e74c3c' : '#27ae60'}">${gameState.pet.fun}%</span>
+                </div>
+                <div class="modal-stat">
+                    <span>❤️ Salud Final:</span>
+                    <span style="color: ${gameState.pet.health <= 15 ? '#e74c3c' : '#27ae60'}">${gameState.pet.health}%</span>
+                </div>
+                <div class="modal-stat">
+                    <span>💖 Amor Final:</span>
+                    <span style="color: ${gameState.pet.love <= 15 ? '#e74c3c' : '#27ae60'}">${gameState.pet.love}%</span>
+                </div>
+                <div class="modal-stat">
+                    <span>💰 Monedas Totales:</span>
+                    <span>${gameState.money}</span>
+                </div>
+            `;
+            
+            document.getElementById('gameOverStats').innerHTML = statsHtml;
+            showModal('gameOverModal');
+        }
+
+        // Función para verificar condición de victoria
+        function checkVictoryCondition() {
+            if (gameState.money >= gameState.savingsGoal.target) {
+                showVictory();
+            }
+        }
+
+        // Función para mostrar victoria
+        function showVictory() {
+            document.getElementById('victoryModalAvatar').textContent = gameState.pet.avatar;
+            document.getElementById('victoryModalMessage').innerHTML = `
+                <strong>¡Lograste comprar ${gameState.savingsGoal.item}!</strong><br><br>
+                ¡Excelente trabajo ahorrando dinero!<br>
+                <strong>${gameState.pet.name}</strong> está muy orgulloso de ti.
+            `;
+            
+            // Mostrar estadísticas de victoria
+            const statsHtml = `
+                <div class="modal-stat">
+                    <span>🎯 Meta Alcanzada:</span>
+                    <span style="color: #27ae60">${gameState.savingsGoal.item}</span>
+                </div>
+                <div class="modal-stat">
+                    <span>💰 Dinero Ahorrado:</span>
+                    <span style="color: #27ae60">${gameState.money} monedas</span>
+                </div>
+                <div class="modal-stat">
+                    <span>🍖 Hambre de ${gameState.pet.name}:</span>
+                    <span style="color: ${getStatColor(gameState.pet.hunger)}">${gameState.pet.hunger}%</span>
+                </div>
+                <div class="modal-stat">
+                    <span>🎾 Diversión de ${gameState.pet.name}:</span>
+                    <span style="color: ${getStatColor(gameState.pet.fun)}">${gameState.pet.fun}%</span>
+                </div>
+                <div class="modal-stat">
+                    <span>❤️ Salud de ${gameState.pet.name}:</span>
+                    <span style="color: ${getStatColor(gameState.pet.health)}">${gameState.pet.health}%</span>
+                </div>
+                <div class="modal-stat">
+                    <span>💖 Amor de ${gameState.pet.name}:</span>
+                    <span style="color: ${getStatColor(gameState.pet.love)}">${gameState.pet.love}%</span>
+                </div>
+            `;
+            
+            document.getElementById('victoryModalStats').innerHTML = statsHtml;
+            showModal('victoryModal');
+        }
+
+        // Función auxiliar para obtener color según el valor del stat
+        function getStatColor(value) {
+            if (value >= 70) return '#27ae60';
+            if (value >= 40) return '#f39c12';
+            return '#e74c3c';
+        }
+
+        // Función para mostrar modal
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        // Función para cerrar modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Función para establecer nueva meta
+        function setNewGoal() {
+            const goals = [
+                { target: 500, item: 'Collar de Diamantes' },
+                { target: 800, item: 'Auto para Mascotas' },
+                { target: 1200, item: 'Mansión Dorada' },
+                { target: 2000, item: 'Isla Privada' }
+            ];
+            
+            const currentIndex = goals.findIndex(goal => goal.target === gameState.savingsGoal.target);
+            const nextGoal = goals[currentIndex + 1];
+            
+            if (nextGoal) {
+                gameState.savingsGoal = nextGoal;
+                showMessage(`¡Nueva meta: ${nextGoal.item}! Necesitas ${nextGoal.target} monedas.`, 'info');
+            } else {
+                showMessage('¡Has completado todas las metas! ¡Eres un maestro del ahorro!', 'success');
+            }
+            
+            closeModal('victoryModal');
+            updateUI();
+        }
+
+        // Función para reiniciar el juego
+        function restartGame() {
+            // Resetear estado del juego
+            gameState = {
+                money: 100,
+                pet: {
+                    name: 'Buddy',
+                    avatar: '🐶',
+                    type: 'perro',
+                    hunger: 75,
+                    fun: 60,
+                    health: 80,
+                    love: 70
+                },
+                ownedItems: [],
+                savingsGoal: {
+                    target: 200,
+                    item: 'Casa de Lujo'
+                },
+                gameActive: false, // Inactivo hasta nueva personalización
+                dangerWarnings: {
+                    hunger: false,
+                    fun: false,
+                    health: false,
+                    love: false
+                }
+            };
+            
+            // Resetear selección de bienvenida
+            welcomeSelection = {
+                avatar: '🐶',
+                type: 'perro',
+                name: 'Buddy'
+            };
+            
+            // Cerrar modal de game over
+            closeModal('gameOverModal');
+            
+            // Mostrar modal de bienvenida para nueva personalización
+            document.getElementById('welcomePetName').value = 'Buddy';
+            document.getElementById('welcomePetName').style.borderColor = '#3498db';
+            
+            // Resetear selección de mascota en modal de bienvenida
+            document.querySelectorAll('#welcomeModal .pet-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.pet === '🐶') {
+                    option.classList.add('selected');
+                }
+            });
+            
+            showModal('welcomeModal');
+        }
+        function buyTrapItem(itemType, price, damage, affectedStat) {
+            if (gameState.money >= price) {
+                gameState.money -= price;
+                gameState.pet[affectedStat] = Math.max(0, gameState.pet[affectedStat] + damage);
+                
+                const messages = {
+                    'candy': '¡Oh no! Los dulces hicieron que tu mascota se sienta mal.',
+                    'junk-food': '¡La comida chatarra no es buena para tu mascota!'
+                };
+                
+                showMessage(messages[itemType] + ` ${damage} ${affectedStat}`, 'error');
+                updateUI();
+            } else {
+                showMessage('¡No tienes suficientes monedas!', 'error');
+            }
+        }
+
+        // Función para compras caras innecesarias
+        function buyExpensiveTrap(itemType, price, benefit, affectedStat) {
+            if (gameState.money >= price) {
+                gameState.money -= price;
+                gameState.pet[affectedStat] = Math.min(100, gameState.pet[affectedStat] + benefit);
+                
+                const messages = {
+                    'tablet': '¡Compraste una tablet cara! Tu mascota se divierte un poco, pero gastaste mucho dinero.',
+                    'expensive-game': '¡Videojuego caro comprado! Era mejor ahorrar para algo más útil.'
+                };
+                
+                showMessage(messages[itemType], 'error');
+                updateUI();
+            } else {
+                showMessage('¡No tienes suficientes monedas! (Por suerte, era muy caro)', 'info');
+            }
+        }
+
+        // Función para compras impulsivas
+        function buyImpulseTrap(itemType, price) {
+            if (gameState.money >= price) {
+                gameState.money -= price;
+                // No da ningún beneficio real
+                showMessage('¡Compraste algo que no necesitabas! Tu mascota no está más feliz y perdiste dinero.', 'error');
+                updateUI();
+            } else {
+                showMessage('¡No tienes suficientes monedas! Mejor así, no lo necesitabas.', 'info');
+            }
+        }
+
+        // Función para juegos de azar (lotería)
+        function buyGambleTrap(itemType, price) {
+            if (gameState.money >= price) {
+                gameState.money -= price;
+                const random = Math.random();
+                
+                if (random < 0.1) { // 10% de posibilidad de ganar
+                    const winnings = price * 3;
+                    gameState.money += winnings;
+                    showMessage(`¡Ganaste la lotería! +${winnings} monedas (pero fue pura suerte)`, 'success');
+                } else {
+                    showMessage('¡Perdiste en la lotería! El juego no es una buena forma de ganar dinero.', 'error');
+                }
+                updateUI();
+            } else {
+                showMessage('¡No tienes suficientes monedas! Mejor así, los juegos de azar son riesgosos.', 'info');
+            }
+        }
+        function buyPermanentItem(itemType, price) {
+            if (gameState.money >= price) {
+                if (gameState.ownedItems.includes(itemType)) {
+                    showMessage('¡Ya tienes este item!', 'info');
+                    return;
+                }
+                
+                gameState.money -= price;
+                gameState.ownedItems.push(itemType);
+                
+                // Aplicar beneficios permanentes
+                switch (itemType) {
+                    case 'auto-feeder':
+                        showMessage('¡Dispensador automático comprado! Tu mascota tendrá hambre más lentamente.', 'success');
+                        break;
+                    case 'fun-park':
+                        showMessage('¡Parque de diversiones comprado! Tu mascota se divertirá automáticamente.', 'success');
+                        break;
+                    case 'luxury-house':
+                        showMessage('¡Casa de lujo comprada! Tu mascota está súper feliz.', 'success');
+                        gameState.pet.love = Math.min(100, gameState.pet.love + 30);
+                        // Cambiar meta de ahorro
+                        gameState.savingsGoal = { target: 500, item: 'Collar de Diamantes' };
+                        break;
+                    case 'diamond-collar':
+                        showMessage('¡Collar de diamantes comprado! Tu mascota brilla de felicidad.', 'success');
+                        gameState.pet.love = 100;
+                        gameState.savingsGoal = { target: 800, item: 'Auto para Mascotas' };
+                        break;
+                    case 'pet-car':
+                        showMessage('¡Auto para mascotas comprado! ¡Has completado el juego!', 'success');
+                        gameState.pet.avatar = '🐶🚗';
+                        break;
+                }
+                
+                updateUI();
+            } else {
+                const needed = price - gameState.money;
+                showMessage(`Necesitas ${needed} monedas más. ¡Sigue ahorrando!`, 'info');
+            }
+        }
+
+        // Función para ganar monedas con actividades
+        function earnMoney(activity, amount) {
+            gameState.money += amount;
+            
+            const activities = {
+                'walk': '¡Paseaste con tu mascota!',
+                'play': '¡Jugaste con tu mascota!',
+                'train': '¡Entrenaste a tu mascota!',
+                'show': '¡Ganaste la competencia!'
+            };
+            
+            showMessage(`${activities[activity]} +${amount} monedas`, 'success');
+            
+            // Beneficios adicionales de la actividad
+            switch (activity) {
+                case 'walk':
+                    gameState.pet.health = Math.min(100, gameState.pet.health + 5);
+                    break;
+                case 'play':
+                    gameState.pet.fun = Math.min(100, gameState.pet.fun + 10);
+                    break;
+                case 'train':
+                    gameState.pet.love = Math.min(100, gameState.pet.love + 8);
+                    break;
+                case 'show':
+                    gameState.pet.love = Math.min(100, gameState.pet.love + 15);
+                    break;
+            }
+            
+            updateUI();
+        }
+
+        // Función para degradar stats con el tiempo
+        function degradeStats() {
+            if (!gameState.gameActive) return;
+            
+            // Solo degradar si no tiene items especiales
+            if (!gameState.ownedItems.includes('auto-feeder')) {
+                gameState.pet.hunger = Math.max(0, gameState.pet.hunger - 3);
+            }
+            
+            if (!gameState.ownedItems.includes('fun-park')) {
+                gameState.pet.fun = Math.max(0, gameState.pet.fun - 2);
+            }
+            
+            gameState.pet.health = Math.max(0, gameState.pet.health - 1);
+            
+            // Amor baja si las otras stats están muy bajas
+            if (gameState.pet.hunger < 30 || gameState.pet.fun < 30 || gameState.pet.health < 30) {
+                gameState.pet.love = Math.max(0, gameState.pet.love - 2);
+            }
+            
+            // Resetear advertencias si los stats mejoran
+            if (gameState.pet.hunger > 20) gameState.dangerWarnings.hunger = false;
+            if (gameState.pet.fun > 20) gameState.dangerWarnings.fun = false;
+            if (gameState.pet.health > 20) gameState.dangerWarnings.health = false;
+            if (gameState.pet.love > 20) gameState.dangerWarnings.love = false;
+            
+            updateUI();
+        }
+
+        // Inicializar el juego
+        function initGame() {
+            // El juego inicia con el modal de bienvenida abierto
+            // La UI se actualizará cuando se complete la personalización
+            
+            // Degradar stats cada 30 segundos (solo cuando el juego esté activo)
+            setInterval(() => {
+                if (gameState.gameActive) {
+                    degradeStats();
+                }
+            }, 30000);
+            
+            // Mostrar consejos ocasionales (solo cuando el juego esté activo)
+            setTimeout(() => {
+                if (gameState.gameActive) {
+                    showMessage('💡 Consejo: ¡Ahorra para items permanentes, duran para siempre!', 'info');
+                }
+            }, 60000); // Después de 1 minuto
+            
+            // Agregar evento al input del nombre para actualizar en tiempo real
+            document.getElementById('welcomePetName').addEventListener('input', function() {
+                this.style.borderColor = '#3498db';
+                welcomeSelection.name = this.value.trim();
+            });
+        }
+
+        // Iniciar el juego cuando la página se carga
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
